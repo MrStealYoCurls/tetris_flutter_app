@@ -35,7 +35,6 @@ class Game extends StatefulWidget {
 class GameState extends State<Game> {
   final GlobalKey _keyGameArea = GlobalKey();
   late Block block;
-  late Timer timer;
   late TimerManager timerManager;
   late List<SubBlock> oldSubBlocks;
   double subBlockWidth = 20.0;
@@ -81,7 +80,7 @@ class GameState extends State<Game> {
 
   @override
   void dispose() {
-    timer.cancel(); // Prevent memory leak by canceling the timer
+    timerManager.cancel();
     super.dispose();
   }
 
@@ -112,13 +111,13 @@ class GameState extends State<Game> {
   // Ends the game
   void endGame() {
     _isPlaying = false;
-    if (timer.isActive) {timer.cancel();}
+    if (timerManager.isActive) {timerManager.cancel();}
   }
 
   // Pauses or resumes the game
   void pauseGame() {
     if (!isPaused) {
-      timer.cancel();
+      timerManager.cancel();
       _isPaused = true;
     } else {
       timerManager.time();
@@ -421,21 +420,23 @@ class GameState extends State<Game> {
 }
 
 class TimerManager {
-  late Timer _timer;
+  Timer? _timer;
   final Duration _duration;
-  late final Function(Timer) _callback;
+  final Function(Timer) _callback;
 
   TimerManager(this._duration, this._callback);
 
   void time() {
+    _timer?.cancel();
     _timer = Timer.periodic(_duration, _callback);
   }
 
-  void pause() {
-    _timer.cancel();
+  void cancel() {
+    if (_timer?.isActive ?? false) {
+      _timer?.cancel();
+    }
   }
 
-  void resume() {
-    time(); // Restart the timer
-  }
+  bool get isActive => _timer?.isActive ?? false;
 }
+

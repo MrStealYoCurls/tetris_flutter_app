@@ -90,7 +90,9 @@ class TetrisState extends State<Tetris> {
                                         _keyGame.currentState!.startGame();
                                       } else if (!_keyGame.currentState!.isPaused){
                                         _keyGame.currentState!.pauseGame();
-                                      } 
+                                      } else if (_keyGame.currentState!.isPaused) {
+                                        _keyGame.currentState!.pauseGame();
+                                      }
                                     }
                                   },
 
